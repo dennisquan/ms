@@ -3,8 +3,8 @@ import HelloWorld from '../components/HelloWorld.vue'
 </script>
 
 <template>
-  <div>
-    <div>
+  <div class="container mx-auto p-8">
+    <div class="flex justify-center gap-8 mb-8">
       <a href="https://vite.dev" target="_blank">
         <img src="/vite.svg" class="logo" alt="Vite logo" />
       </a>
@@ -12,9 +12,13 @@ import HelloWorld from '../components/HelloWorld.vue'
         <img src="../assets/vue.svg" class="logo vue" alt="Vue logo" />
       </a>
     </div>
+    
     <HelloWorld msg="Vite + Vue + TypeScript" />
-    <div class="card">
-      <router-link to="/about">Go to About</router-link>
+    
+    <div class="mt-8 space-y-4">
+      <UButton to="/about" icon="i-heroicons-information-circle" size="lg">
+        Go to About Page
+      </UButton>
     </div>
   </div>
 </template>
@@ -31,8 +35,5 @@ import HelloWorld from '../components/HelloWorld.vue'
 }
 .logo.vue:hover {
   filter: drop-shadow(0 0 2em #42b883aa);
-}
-.card {
-  padding: 2em;
 }
 </style>
