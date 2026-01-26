@@ -4,9 +4,14 @@ import { ref, computed, watch } from 'vue'
 
 import eqQuestions from '../content/earthquakes1'
 import jeopardyQuestions from '../content/20260108_jeopardy'
+import station4Questions from '../content/20260122_station4'
 
+const questions = [
+  ...eqQuestions, 
+  ...jeopardyQuestions,
+  ...station4Questions,
+]
 
-const questions = [...eqQuestions, ...jeopardyQuestions]
 const current = ref(0)
 const selected = ref<number | null>(null)
 const showAnswer = ref(false)
