@@ -7,12 +7,47 @@ import jeopardyQuestions from '../content/20260108_jeopardy'
 import station3Questions from '../content/20260122_station3'
 import station4Questions from '../content/20260122_station4'
 
-const questions = [
-  ...eqQuestions, 
+// Deterministic PRNG (mulberry32)
+function mulberry32(seed: number) {
+  return function() {
+    let t = seed += 0x6D2B79F5;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  }
+}
+
+// Get seed from query string
+function getSeedFromQuery(): number {
+  if (typeof window === 'undefined') return 42;
+  const params = new URLSearchParams(window.location.search);
+  const s = params.get('seed');
+  const n = Number(s);
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : 42;
+}
+
+function seededShuffle<T>(array: T[], seed: number): T[] {
+  const prng = mulberry32(seed);
+  const arr = array.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(prng() * (i + 1));
+    const temp = arr[i]!;
+    arr[i] = arr[j]!;
+    arr[j] = temp;
+  }
+  return arr;
+}
+
+const allQuestions = [
+  ...eqQuestions,
   ...jeopardyQuestions,
   ...station3Questions,
   ...station4Questions,
-]
+];
+
+const seed = getSeedFromQuery();
+const questions = seededShuffle(allQuestions, seed);
+
 
 const current = ref(0)
 const selected = ref<number | null>(null)
