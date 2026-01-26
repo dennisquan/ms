@@ -55,9 +55,12 @@ const showAnswer = ref(false)
 const imageSrc = ref<string | null>(null)
 const shuffledAnswers = ref<{answers: string[], correct: number} | null>(null)
 
+
 const attempted = ref(0)
 const correct = ref(0)
 const wrong = ref(0)
+const totalQuestions = questions.length
+const showEndAlert = ref(false)
 
 const question = computed(() => questions[current.value])
 
@@ -115,7 +118,13 @@ function selectAnswer(idx: number) {
 function nextQuestion() {
   selected.value = null
   showAnswer.value = false
-  current.value = (current.value + 1) % questions.length
+  if (current.value + 1 >= questions.length) {
+    showEndAlert.value = true
+    // Optionally, reset to first question or keep at last
+    // current.value = 0
+    return
+  }
+  current.value = current.value + 1
   shuffleAnswers()
 }
 </script>
@@ -126,6 +135,14 @@ function nextQuestion() {
       <span class="text-base font-medium">Attempted: {{ attempted }}</span>
       <span class="text-green-600 font-medium">Correct: {{ correct }}</span>
       <span class="text-red-600 font-medium">Wrong: {{ wrong }}</span>
+      <span class="text-blue-600 font-medium">Total: {{ totalQuestions }}</span>
+    </div>
+    <div v-if="showEndAlert" class="mb-4">
+      <div class="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded relative" role="alert">
+        <strong class="font-bold">End of questions!</strong>
+        <span class="block">You have reached the end of the question bank.</span>
+        <button class="absolute top-0 bottom-0 right-0 px-4 py-3" @click="showEndAlert = false">×</button>
+      </div>
     </div>
     <UCard>
       <template #header>
