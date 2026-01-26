@@ -4,11 +4,13 @@ import { ref, computed, watch } from 'vue'
 
 import eqQuestions from '../content/earthquakes1'
 import jeopardyQuestions from '../content/20260108_jeopardy'
+import station3Questions from '../content/20260122_station3'
 import station4Questions from '../content/20260122_station4'
 
 const questions = [
   ...eqQuestions, 
   ...jeopardyQuestions,
+  ...station3Questions,
   ...station4Questions,
 ]
 
