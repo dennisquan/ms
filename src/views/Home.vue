@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 
-import eqQuestions from '../content/earthquakes1'
+import seismicStations from '../content/seismicStations'
 import jeopardyQuestions from '../content/20260108_jeopardy'
 import station1Questions from '../content/20260122_station1'
 import station3Questions from '../content/20260122_station3'
@@ -42,7 +42,7 @@ function seededShuffle<T>(array: T[], seed: number): T[] {
 }
 
 const allQuestions = [
-  ...eqQuestions,
+  ...seismicStations,
   ...jeopardyQuestions,
   ...station1Questions,
   ...station3Questions,
