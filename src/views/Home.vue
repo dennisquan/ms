@@ -7,6 +7,7 @@ import jeopardyQuestions from '../content/20260108_jeopardy'
 import station3Questions from '../content/20260122_station3'
 import station4Questions from '../content/20260122_station4'
 import station6Questions from '../content/20260122_station6'
+import station9Questions from '../content/20260122_station9'
 
 // Deterministic PRNG (mulberry32)
 function mulberry32(seed: number) {
