@@ -6,6 +6,7 @@ import eqQuestions from '../content/earthquakes1'
 import jeopardyQuestions from '../content/20260108_jeopardy'
 import station3Questions from '../content/20260122_station3'
 import station4Questions from '../content/20260122_station4'
+import station6Questions from '../content/20260122_station6'
 
 // Deterministic PRNG (mulberry32)
 function mulberry32(seed: number) {
@@ -43,6 +44,7 @@ const allQuestions = [
   ...jeopardyQuestions,
   ...station3Questions,
   ...station4Questions,
+  ...station6Questions,
 ];
 
 const seed = getSeedFromQuery();
