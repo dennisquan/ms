@@ -4,6 +4,7 @@ import { ref, computed, watch } from 'vue'
 
 import eqQuestions from '../content/earthquakes1'
 import jeopardyQuestions from '../content/20260108_jeopardy'
+import station1Questions from '../content/20260122_station1'
 import station3Questions from '../content/20260122_station3'
 import station4Questions from '../content/20260122_station4'
 import station6Questions from '../content/20260122_station6'
@@ -43,6 +44,7 @@ function seededShuffle<T>(array: T[], seed: number): T[] {
 const allQuestions = [
   ...eqQuestions,
   ...jeopardyQuestions,
+  ...station1Questions,
   ...station3Questions,
   ...station4Questions,
   ...station6Questions,
