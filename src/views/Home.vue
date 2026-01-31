@@ -45,6 +45,7 @@ const allQuestions = [
   ...station3Questions,
   ...station4Questions,
   ...station6Questions,
+  ...station9Questions,
 ];
 
 const seed = getSeedFromQuery();
