@@ -2,14 +2,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 
-import seismicStationQuestions from '../content/seismicStations'
-import foreMainAfterShockQuestions from '../content/foreMainAfterShocks'
-import jeopardyQuestions from '../content/20260108_jeopardy'
-import station1Questions from '../content/20260122_station1'
-import station3Questions from '../content/20260122_station3'
-import station4Questions from '../content/20260122_station4'
-import station6Questions from '../content/20260122_station6'
-import station9Questions from '../content/20260122_station9'
+import allQuestions from '../content/questions'
 
 // Deterministic PRNG (mulberry32)
 function mulberry32(seed: number) {
@@ -42,16 +35,6 @@ function seededShuffle<T>(array: T[], seed: number): T[] {
   return arr;
 }
 
-const allQuestions = [
-  ...seismicStationQuestions,
-  ...foreMainAfterShockQuestions,
-  ...jeopardyQuestions,
-  ...station1Questions,
-  ...station3Questions,
-  ...station4Questions,
-  ...station6Questions,
-  ...station9Questions,
-];
 
 const seed = getSeedFromQuery();
 const questions = seededShuffle(allQuestions, seed);
