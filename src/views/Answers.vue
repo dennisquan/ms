@@ -1,15 +1,30 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, h } from 'vue'
 import allQuestions from '../content/questions'
 
 const filter = ref('')
+const loadedImages = ref<Map<number, string>>(new Map())
 
-// Flatten questions for table
+onMounted(async () => {
+  // Load all images using same logic as Home.vue
+  for (let idx = 0; idx < allQuestions.length; idx++) {
+    const q = allQuestions[idx]
+    if (q && 'imagePromise' in q && q.imagePromise) {
+      try {
+        const module = await (q as any).imagePromise
+        loadedImages.value.set(idx, module.default)
+      } catch (err) {
+        console.error(`Failed to load image for question ${idx}:`, err)
+      }
+    }
+  }
+})
+
 const tableData = computed(() => {
   return allQuestions.map((q, idx) => ({
     id: idx + 1,
     question: q.question,
-    image: q.imagePromise ? q.imagePromise : null,
+    image: loadedImages.value.get(idx) || null,
     answers: q.answers.join(' | '),
     correct: q.answers[q.correctAnswerIndex] ?? 'unknown',
     category: q.category || '',
@@ -26,39 +41,69 @@ const tableData = computed(() => {
 })
 
 const columns = [
-  { key: 'id', label: '#', sortable: true },
-  { key: 'question', label: 'Question', sortable: true },
-  { key: 'image', label: 'Image', sortable: false },
-  { key: 'answers', label: 'Answers', sortable: false },
-  { key: 'correct', label: 'Correct Answer', sortable: true },
-  { key: 'category', label: 'Category', sortable: true },
+  { accessorKey: 'id', label: '#', sortable: true },
+  {
+    accessorKey: 'question',
+    label: 'Question',
+    sortable: true,
+    cell: ({ row }: { row: { getValue: (key: string) => unknown } }) =>
+      h(
+        'div',
+        { class: 'text-left whitespace-normal break-words', style: 'max-width: 400px;' },
+        row.getValue('question') as string
+      ),
+  },
+  {
+    accessorKey: 'image',
+    label: 'Image',
+    sortable: false,
+    cell: ({ row }: { row: { getValue: (key: string) => unknown } }) => {
+      const src = row.getValue('image') as string | null
+      if (!src) {
+        return h('span', { class: 'text-gray-400 text-sm' }, '-')
+      }
+      return h('img', {
+        src,
+        alt: 'Question image',
+        class: 'max-h-24 max-w-32 rounded mx-auto',
+      })
+    },
+  },
+  {
+    accessorKey: 'answers',
+    label: 'Answers',
+    sortable: false,
+    cell: ({ row }: { row: { getValue: (key: string) => unknown } }) =>
+      h(
+        'div',
+        { class: 'whitespace-normal break-words', style: 'max-width: 300px;' },
+        row.getValue('answers') as string
+      ),
+  },
+  { accessorKey: 'correct', label: 'Correct Answer', sortable: true },
+  { accessorKey: 'category', label: 'Category', sortable: true },
 ]
 </script>
 
 <template>
-  <div class="container mx-auto p-8 max-w-6xl">
-    <div class="mb-4 flex items-center gap-4">
+  <div class="flex flex-col h-screen relative overflow-x-hidden">
+    <div class="sticky top-0 shrink-0 p-4">
       <UInput v-model="filter" placeholder="Filter questions..." class="w-96" />
     </div>
     <UTable
       :columns="columns"
-      :rows="tableData"
+      :data="tableData"
       :sort="{ column: 'id', direction: 'asc' }"
-      sticky-header
-      class="max-h-[80vh] overflow-auto"
-    >
-      <template #cell(image)="{ row }">
-        <img v-if="row.image" :src="row.image.default" alt="Question image" class="max-h-24 rounded mx-auto" />
-      </template>
-    </UTable>
+      :ui="{
+        wrapper: 'grow overflow-auto',
+        thead: 'sticky top-0',
+      }"
+    />
   </div>
 </template>
 
 <style scoped>
-th {
-  position: sticky;
-  top: 0;
-  background: white;
-  z-index: 2;
+.text-left {
+  text-align: left;
 }
 </style>
