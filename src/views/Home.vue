@@ -4,39 +4,10 @@ import { ref, computed, watch } from 'vue'
 import { useUrlSearchParams } from '@vueuse/core'
 
 import allQuestions from '../content/questions'
-
-// Deterministic PRNG (mulberry32)
-function mulberry32(seed: number) {
-  return function() {
-    let t = seed += 0x6D2B79F5;
-    t = Math.imul(t ^ t >>> 15, t | 1);
-    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
-  }
-}
+import { getSeedFromQuery, seededShuffle } from '../content/seedUtils'
 
 
-// Use VueUse to get and set query params
 const params = useUrlSearchParams('hash')
-
-function getSeedFromQuery(): number {
-  const n = Number(params.seed)
-  return Number.isFinite(n) && n > 0 ? Math.floor(n) : 42
-}
-
-function seededShuffle<T>(array: T[], seed: number): T[] {
-  const prng = mulberry32(seed);
-  const arr = array.slice();
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(prng() * (i + 1));
-    const temp = arr[i]!;
-    arr[i] = arr[j]!;
-    arr[j] = temp;
-  }
-  return arr;
-}
-
-
 const seed = getSeedFromQuery();
 const questions = seededShuffle(allQuestions, seed);
 

@@ -1,14 +1,20 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, h } from 'vue'
+
 import allQuestions from '../content/questions'
+import { getSeedFromQuery, seededShuffle } from '../content/seedUtils'
+
 
 const filter = ref('')
 const loadedImages = ref<Map<number, string>>(new Map())
 
+const seed = getSeedFromQuery()
+const orderedQuestions = seededShuffle(allQuestions, seed)
+
 onMounted(async () => {
   // Load all images using same logic as Home.vue
-  for (let idx = 0; idx < allQuestions.length; idx++) {
-    const q = allQuestions[idx]
+  for (let idx = 0; idx < orderedQuestions.length; idx++) {
+    const q = orderedQuestions[idx]
     if (q && 'imagePromise' in q && q.imagePromise) {
       try {
         const module = await (q as any).imagePromise
@@ -21,7 +27,7 @@ onMounted(async () => {
 })
 
 const tableData = computed(() => {
-  return allQuestions.map((q, idx) => ({
+  return orderedQuestions.map((q, idx) => ({
     id: idx + 1,
     question: q.question,
     image: loadedImages.value.get(idx) || null,
