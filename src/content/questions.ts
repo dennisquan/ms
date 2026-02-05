@@ -9,6 +9,7 @@ import station9Questions from './20260122_station9'
 import sampleTestSection1Questions from './sample_test_section1'
 import sampleTestSection3Questions from './sample_test_section3'
 import sampleTestSection10Questions from './sample_test_section10'
+import earthquakeDataTableQuestions from './earthquakeDataTables'
 
 const allQuestions = [
   ...seismicStationQuestions,
@@ -22,6 +23,7 @@ const allQuestions = [
   ...sampleTestSection1Questions,
   ...sampleTestSection3Questions,
   ...sampleTestSection10Questions,
+  ...earthquakeDataTableQuestions,
 ]
 
 export default allQuestions
