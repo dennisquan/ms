@@ -1,6 +1,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useUrlSearchParams } from '@vueuse/core'
 
 import allQuestions from '../content/questions'
 
@@ -14,13 +15,13 @@ function mulberry32(seed: number) {
   }
 }
 
-// Get seed from query string
+
+// Use VueUse to get and set query params
+const params = useUrlSearchParams('hash')
+
 function getSeedFromQuery(): number {
-  if (typeof window === 'undefined') return 42;
-  const params = new URLSearchParams(window.location.search);
-  const s = params.get('seed');
-  const n = Number(s);
-  return Number.isFinite(n) && n > 0 ? Math.floor(n) : 42;
+  const n = Number(params.seed)
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : 42
 }
 
 function seededShuffle<T>(array: T[], seed: number): T[] {
@@ -39,8 +40,12 @@ function seededShuffle<T>(array: T[], seed: number): T[] {
 const seed = getSeedFromQuery();
 const questions = seededShuffle(allQuestions, seed);
 
+// Start index from query param 'i' if present
+const initialIndex = Number.isFinite(Number(params.i)) && Number(params.i) >= 0 && Number(params.i) < questions.length
+  ? Number(params.i)
+  : 0
 
-const current = ref(0)
+const current = ref(initialIndex)
 const selected = ref<number | null>(null)
 const showAnswer = ref(false)
 const imageSrc = ref<string | null>(null)
@@ -106,16 +111,19 @@ function selectAnswer(idx: number) {
 }
 
 
+
 function nextQuestion() {
   selected.value = null
   showAnswer.value = false
   if (current.value + 1 >= questions.length) {
     showEndAlert.value = true
-    // Optionally, reset to first question or keep at last
-    // current.value = 0
     return
   }
   current.value = current.value + 1
+  // If 'i' was present in query, update it; otherwise, leave undefined
+  if ('i' in params) {
+    params.i = String(current.value)
+  }
   shuffleAnswers()
 }
 </script>
