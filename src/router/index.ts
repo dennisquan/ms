@@ -13,6 +13,11 @@ const router = createRouter({
       name: 'Answers',
       component: () => import('../views/Answers.vue')
     },
+    {
+      path: '/printable-flashcards',
+      name: 'PrintableFlashcards',
+      component: () => import('../views/PrintableFlashcards.vue')
+    },
   ]
 })
 
