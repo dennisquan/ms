@@ -44,19 +44,24 @@ const flashcards = computed(() => {
 
 const printableCards = computed(() => {
   const cards = flashcards.value
-  const batchedCards: Array<(typeof cards)[number] & { side: 'question' | 'answer' }> = []
+  const batchedCards: Array<{ side: 'question' | 'answer'; card: (typeof cards)[number] | null }> = []
 
   for (let start = 0; start < cards.length; start += per.value) {
     const group = cards.slice(start, start + per.value)
+    const paddedGroup: Array<(typeof cards)[number] | null> = [...group]
 
-    batchedCards.push(...group.map((card) => ({ ...card, side: 'question' as const })))
-
-    let answerGroup = group
-    if (per.value === 4 && group.length === 4) {
-      answerGroup = [group[1]!, group[0]!, group[3]!, group[2]!]
+    while (paddedGroup.length < per.value) {
+      paddedGroup.push(null)
     }
 
-    batchedCards.push(...answerGroup.map((card) => ({ ...card, side: 'answer' as const })))
+    batchedCards.push(...paddedGroup.map((card) => ({ side: 'question' as const, card })))
+
+    let answerGroup = paddedGroup
+    if (per.value === 4) {
+      answerGroup = [paddedGroup[1] ?? null, paddedGroup[0] ?? null, paddedGroup[3] ?? null, paddedGroup[2] ?? null]
+    }
+
+    batchedCards.push(...answerGroup.map((card) => ({ side: 'answer' as const, card })))
   }
 
   return batchedCards
@@ -65,24 +70,28 @@ const printableCards = computed(() => {
 
 <template>
   <div class="printable-flashcards">
-    <div v-for="(card, idx) in printableCards" :key="`${card.side}-${card.id}-${idx}`" class="flashcard-side flex min-h-[90vh] flex-col justify-center gap-4 border p-6 mb-4">
-      <template v-if="card.side === 'question'">
-        <h2 class="flashcard-title">Question {{ card.id }}</h2>
-        <p class="flashcard-question">{{ card.question }}</p>
+    <div v-for="(cardEntry, idx) in printableCards" :key="`${cardEntry.side}-${cardEntry.card?.id ?? 'blank'}-${idx}`" class="flashcard-side flex min-h-[90vh] flex-col justify-center gap-4 border p-6 mb-4">
+      <template v-if="cardEntry.card && cardEntry.side === 'question'">
+        <h2 class="flashcard-title">Question {{ cardEntry.card.id }}</h2>
+        <p class="flashcard-question">{{ cardEntry.card.question }}</p>
 
-        <img v-if="card.image" :src="card.image" alt="Question image" class="flashcard-image" />
+        <img v-if="cardEntry.card.image" :src="cardEntry.card.image" alt="Question image" class="flashcard-image" />
 
         <ol class="flashcard-choices">
-          <li v-for="(choice, choiceIdx) in card.answers" :key="choiceIdx">
+          <li v-for="(choice, choiceIdx) in cardEntry.card.answers" :key="choiceIdx">
             <span class="choice-label">{{ String.fromCharCode(65 + choiceIdx) }}.</span>
             <span>{{ choice }}</span>
           </li>
         </ol>
       </template>
 
+      <template v-else-if="cardEntry.card">
+        <h2 class="flashcard-title">Answer {{ cardEntry.card.id }}</h2>
+        <p class="flashcard-answer">{{ cardEntry.card.correctLetter }}. {{ cardEntry.card.correct }}</p>
+      </template>
+
       <template v-else>
-        <h2 class="flashcard-title">Answer {{ card.id }}</h2>
-        <p class="flashcard-answer">{{ card.correctLetter }}. {{ card.correct }}</p>
+        <div aria-hidden="true" class="h-full w-full"></div>
       </template>
     </div>
   </div>
